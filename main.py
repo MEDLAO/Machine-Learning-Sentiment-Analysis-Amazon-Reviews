@@ -12,6 +12,8 @@ nltk.download('vader_lexicon')
 from nltk.sentiment import SentimentIntensityAnalyzer
 from tqdm import tqdm
 from pprintpp import pprint
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from scipy.special import softmax
 
 
 # 1 - Loading the data
@@ -84,9 +86,51 @@ vaders = vaders.merge(df, how='left')
 # print(vaders)
 
 # Data and metadata :
-print(vaders.head())
+# print(vaders.head())
 
 # Plot VADER results :
-ax = sns.barplot(data=vaders, x='Score', y='compound')
-ax.set_title('Compound Score by Amazon Star Review')
-plt.show()
+# ax = sns.barplot(data=vaders, x='Score', y='compound')
+# ax.set_title('Compound Score by Amazon Star Review')
+# plt.show()
+
+fig, axs = plt.subplots(1, 3, figsize=(12, 3))
+sns.barplot(data=vaders, x='Score', y='pos', ax=axs[0])
+sns.barplot(data=vaders, x='Score', y='neu', ax=axs[1])
+sns.barplot(data=vaders, x='Score', y='neg', ax=axs[2])
+
+axs[0].set_title('Positive')
+axs[0].set_xlabel('Rating')
+axs[0].set_ylabel('Polarity')
+
+axs[1].set_title('Neutral')
+axs[1].set_xlabel('Rating')
+axs[1].set_ylabel('Polarity')
+
+axs[2].set_title('Negative')
+axs[2].set_xlabel('Rating')
+axs[2].set_ylabel('Polarity')
+
+# plt.show()
+
+# 5 - RoBERTa : Pre-trained Model
+# Initializing the RoBERTa Model :
+# a RoBERTa model fine-tuned on Twitter data for sentiment analysis :
+MODEL = "cardiffnlp/twitter-roberta-base-sentiment"
+# loading the tokenizer associated with the specified pre-trained model :
+tokenizer = AutoTokenizer.from_pretrained(MODEL)
+# loading the pre-trained model for sequence classification :
+model = AutoModelForSequenceClassification.from_pretrained(MODEL)
+
+# Running RoBERTa Model :
+encoded_text = tokenizer(example, return_tensors='pt')
+# print(encoded_text)
+output = model(**encoded_text)
+# print(output)
+# converting the raw model output from a PyTorch tensor into a NumPy array :
+scores = output[0][0].detach().numpy()
+# print(scores)
+scores = softmax(scores)  # converts a vector of raw scores (logits) into probabilities (0, 1)
+# print(scores)
+scores_dict = {'roberta-neg': scores[0], 'roberta_neu': scores[1], 'roberta_pos': scores[2]}
+# print(scores_dict)
+# {'roberta-neg': 0.97635514, 'roberta_neu': 0.020687465, 'roberta_pos': 0.0029573692}
