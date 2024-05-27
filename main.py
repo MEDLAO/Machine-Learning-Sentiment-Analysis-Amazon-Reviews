@@ -12,7 +12,7 @@ nltk.download('vader_lexicon')
 from nltk.sentiment import SentimentIntensityAnalyzer
 from tqdm import tqdm
 from pprintpp import pprint
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 from scipy.special import softmax
 
 
@@ -176,5 +176,30 @@ sns.pairplot(data=results_df, vars=['vader_neg', 'vader_neu', 'vader_pos', 'robe
 # plt.show()
 
 # 7 - Review Examples
+# Let's look at some examples where the model scoring and review score differ the most :
+# Positive sentiment  1-Star review :
+pos_roberta_example = results_df.query('Score == 1').sort_values('roberta_pos', ascending=False)['Text'].values[0]
+# print(pos_roberta_example)
+# "I felt energized within five minutes, but it lasted for about 45 minutes.
+# I paid $3.99 for this drink. I could have just drunk a cup of coffee and saved my money."
 
+pos_vader_example = results_df.query('Score == 1').sort_values('vader_pos', ascending=False)['Text'].values[0]
+# print(pos_vader_example)
+# "So we cancelled the order.  It was cancelled without any problem.  That is a positive note..."
+
+
+# Negative sentiment  5-Star review :
+neg_roberta_example = results_df.query('Score == 5').sort_values('roberta_neg', ascending=False)['Text'].values[0]
+print(neg_roberta_example)
+# "this was sooooo deliscious but too bad i ate em too fast and gained 2 pds! my fault"
+
+neg_vader_example = results_df.query('Score == 5').sort_values('vader_neg', ascending=False)['Text'].values[0]
+print(neg_vader_example)
+# "this was sooooo deliscious but too bad i ate em too fast and gained 2 pds! my fault"
+
+# Extra : The Transformers Pipeline
+# Quick and easy way to run sentiment predictions :
+sent_pipeline = pipeline("sentiment-analysis")
+transf_score = sent_pipeline("I love sentiment analysis!")
+# print(transf_score) # [{'label': 'POSITIVE', 'score': 0.9997853636741638}]
 
