@@ -17,7 +17,7 @@
 
 In this project we are conducting a sentiment analysis using two NLP methods :
 * VADER  (Valence Aware Dictionary and Sentiment Reasoner) - Bag of words approach 
-* RobERTa (Robustly optimized BERT approach) - Pretrained model 
+* RoBERTa (Robustly optimized BERT approach) - Pretrained model 
 
 This analysis is based on a dataset of Amazon fine food reviews.
 
@@ -90,7 +90,7 @@ urllib3 2.2.1
 
 ## 5. Conclusion :
 
-  * Globally, both VADER and RoBERTa models are effective and produce similar values that are
+  * Overall, both VADER and RoBERTa models are effective and produce similar values that are
   consistent with the review scoring, except for some discrepancies between the results and the 
   review scores.
   * Moreover, by comparing these two models, it turns out that RoBERTa seems more accurate in 
